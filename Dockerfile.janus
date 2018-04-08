@@ -16,7 +16,6 @@ RUN apt-get update && \
 COPY janusgraph/run.sh /workspace/janusgraph
 COPY janusgraph/gremlin-server.yaml /workspace/janusgraph/conf/gremlin-server/gremlin-server.yaml
 COPY janusgraph/janusgraph.properties /workspace/janusgraph/janusgraph.properties
-COPY janusgraph/janusgraph-credentials-server.properties /workspace/janusgraph-credentials-server.properties
 COPY janusgraph/empty-sample.groovy /workspace/janusgraph/scripts/empty-sample.groovy
 
 WORKDIR /workspace/janusgraph
