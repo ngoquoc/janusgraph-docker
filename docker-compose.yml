@@ -1,11 +1,5 @@
 version: '3'
 
-# As of Titan 1.0.0, only Cassandra 2.1 and Elasticsearch 1.5
-# are supported. Attempting to run it on Cassandra 3 results in tears.
-#
-# Here's the compatibility matrix:
-#   http://s3.thinkaurelius.com/docs/titan/1.0.0/version-compat.html
-
 services:
   janus:
     image: janusgraph:0.2.0-hadoop2
@@ -21,30 +15,23 @@ services:
     depends_on:
       - db
       - index
+    command: ["/bin/bash", "-e", "/workspace/janusgraph/run.sh"]
   db:
-    image: scylladb/scylla:2.0.1
+    image: cassandra:latest
+    command: /bin/bash -c "sleep 1 && echo ' -- Pausing to let system catch up ... -->' && /docker-entrypoint.sh cassandra -f"
+    environment:
+      - CASSANDRA_START_RPC=true
     ports:
-     # http://docs.scylladb.com/kb/posix/
-     # REST API
-     - "10000:10000"
-     # CQL ports (native_transport_port)
-     - "9042:9042"
-     # Thrift (rpc_port)
-     - "9160:9160"
-     # Internode
-     - "7000:7000"
-     - "7001:7001"
-     # JMX
-     - "7199:7199"
-     # Prometheus monitoring
-     - "9180:9180"
-     - "9100:9100"
-    volumes:
-     - ./data/scylla/data:/var/lib/scylla
+      - "7199:7199" # JMX
+      - "7000:7000" # cluster communication
+      - "7001:7001" # cluster communication (SSL)
+      - "9042:9042" # native protocol clients
+      - "9160:9160" # thrift clients
+      # Prometheus monitoring
+      - "9180:9180"
+      - "9100:9100"
   index:
-    image: elasticsearch:5
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.3
     ports:
      - "9200:9200"
      - "9300:9300"
-    volumes:
-     - ./data/elasticsearch/data:/usr/share/elasticsearch/data

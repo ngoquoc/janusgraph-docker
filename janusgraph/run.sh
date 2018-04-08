@@ -1,4 +1,4 @@
-#!/bin/env bash
+# !/bin/env bash
 
 BIN=./bin
 SLEEP_INTERVAL_S=2
@@ -30,8 +30,15 @@ wait_for_startup() {
     return 1
 }
 
-ELASTICSEARCH_STARTUP_TIMEOUT_S=60
-CASSANDRA_STARTUP_TIMEOUT_S=60
+ELASTICSEARCH_STARTUP_TIMEOUT_S=300
+CASSANDRA_STARTUP_TIMEOUT_S=300
+
+wait_for_startup Cassandra \
+	db \
+	9042 \
+	$CASSANDRA_STARTUP_TIMEOUT_S || {
+    exit 1
+}
 
 wait_for_startup Elasticsearch \
 	index \
@@ -40,9 +47,9 @@ wait_for_startup Elasticsearch \
     exit 1
 }
 
-wait_for_startup Cassandra \
+wait_for_startup Cassandra_Thrift \
 	db \
-	9042 \
+	9160 \
 	$CASSANDRA_STARTUP_TIMEOUT_S || {
     exit 1
 }
